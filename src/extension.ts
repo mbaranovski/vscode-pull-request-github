@@ -11,11 +11,11 @@ import { PostCommitCommandsProvider, Repository } from './api/api';
 import { GitApiImpl } from './api/api1';
 import { registerCommands } from './commands';
 import { commands, contexts } from './common/executeCommands';
-import { isSubmodule } from './common/gitUtils';
+import { isSubmodule, isWorktree } from './common/gitUtils';
 import Logger from './common/logger';
 import * as PersistentState from './common/persistentState';
 import { parseRepositoryRemotes } from './common/remote';
-import { AUTO_REPO_DETECTION, AutoRepoDetectionVariants, BRANCH_PUBLISH, EXPERIMENTAL_CHAT, FILE_LIST_LAYOUT, GIT, IGNORE_SUBMODULES, OPEN_DIFF_ON_CLICK, PR_SETTINGS_NAMESPACE, SHOW_INLINE_OPEN_FILE_ACTION } from './common/settingKeys';
+import { AUTO_REPO_DETECTION, AutoRepoDetectionVariants, BRANCH_PUBLISH, EXPERIMENTAL_CHAT, FILE_LIST_LAYOUT, GIT, IGNORE_SUBMODULES, IGNORE_WORKTREES, OPEN_DIFF_ON_CLICK, PR_SETTINGS_NAMESPACE, SHOW_INLINE_OPEN_FILE_ACTION } from './common/settingKeys';
 import { initBasedOnSettingChange } from './common/settingsUtils';
 import { TemporaryState } from './common/temporaryState';
 import { Schemes } from './common/uri';
@@ -216,6 +216,13 @@ async function init(
 			const ignoreSubmodules = vscode.workspace.getConfiguration(PR_SETTINGS_NAMESPACE).get<boolean>(IGNORE_SUBMODULES, false);
 			if (ignoreSubmodules && isSubmodule(repo, git)) {
 				Logger.appendLine(`Repo ${repo.rootUri} is a submodule and will be ignored due to ${IGNORE_SUBMODULES} setting.`, ACTIVATION);
+				return;
+			}
+
+			// Check if worktrees should be ignored
+			const ignoreWorktrees = vscode.workspace.getConfiguration(PR_SETTINGS_NAMESPACE).get<boolean>(IGNORE_WORKTREES, false);
+			if (ignoreWorktrees && isWorktree(repo, git)) {
+				Logger.appendLine(`Repo ${repo.rootUri} is a worktree and will be ignored due to ${IGNORE_WORKTREES} setting.`, ACTIVATION);
 				return;
 			}
 

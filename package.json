@@ -442,6 +442,11 @@
 					"default": false,
 					"description": "%githubPullRequests.ignoreSubmodules.description%"
 				},
+				"githubPullRequests.ignoreWorktrees": {
+					"type": "boolean",
+					"default": false,
+					"description": "%githubPullRequests.ignoreWorktrees.description%"
+				},
 				"githubPullRequests.neverIgnoreDefaultBranch": {
 					"type": "boolean",
 					"description": "%githubPullRequests.neverIgnoreDefaultBranch.description%"

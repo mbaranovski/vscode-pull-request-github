@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
+import { isDescendant } from './utils';
 import { Repository } from '../api/api';
 import { GitApiImpl } from '../api/api1';
 
@@ -349,6 +350,27 @@ export function unwrapCommitMessageBody(body: string): string {
 	}
 
 	return result.join('\n');
+}
+
+/**
+ * Determines if a repository is a git worktree by checking if its path
+ * resides inside another repository's `.worktrees` directory.
+ */
+export function isWorktree(repo: Repository, git: GitApiImpl): boolean {
+	const repoPath = repo.rootUri.fsPath;
+
+	for (const otherRepo of git.repositories) {
+		if (otherRepo.rootUri.toString() === repo.rootUri.toString()) {
+			continue;
+		}
+
+		const worktreesPath = vscode.Uri.joinPath(otherRepo.rootUri, '.worktrees').fsPath;
+		if (isDescendant(worktreesPath, repoPath) && worktreesPath !== repoPath) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
